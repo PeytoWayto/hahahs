@@ -17,6 +17,9 @@ import {
   User,
   Gamepad2,
   Users,
+  Globe,
+  Vote,
+  Server,
 } from "lucide-react"
 import IsoRoom, { type RoomPreset } from "@/components/iso-room"
 import EnhancedChatPanel from "@/components/enhanced-chat-panel"
@@ -24,6 +27,9 @@ import WindowFrame from "@/components/window-frame"
 import AvatarCustomizer from "@/components/avatar-customizer"
 import GamesHub from "@/components/games-hub"
 import SocialHub from "@/components/social-hub"
+import ExperienceBrowser from "@/components/experience-browser"
+import ExperiencePollHub from "@/components/experience-poll-hub"
+import ServerCapacityDashboard from "@/components/server-capacity-dashboard"
 import styles from "@/styles/habbo.module.css"
 import { useMultiplayer } from "@/hooks/use-multiplayer"
 import { ChipTune } from "@/lib/chiptune-fallback"
@@ -85,6 +91,9 @@ export default function Page() {
   const [gamesOpen, setGamesOpen] = useState(false)
   const [socialOpen, setSocialOpen] = useState(false)
   const [avatarCustomization, setAvatarCustomization] = useState<AvatarCustomization>(getStoredCustomization())
+  const [experienceBrowserOpen, setExperienceBrowserOpen] = useState(false)
+  const [pollHubOpen, setPollHubOpen] = useState(false)
+  const [serverDashboardOpen, setServerDashboardOpen] = useState(false)
 
   const [uid, setUid] = useState("")
   const [displayName, setDisplayName] = useState("Guest")
@@ -293,12 +302,25 @@ export default function Page() {
     <div className="min-h-[100dvh] flex flex-col bg-[#9bbad3]">
       <header className="border-b border-black/40 bg-[#2f2f2f]">
         <div className="max-w-6xl mx-auto px-3 py-2 flex items-center gap-3">
-          <div className={styles.logoBlock} aria-label="Pixel Plaza logo">
-            <span className={styles.logoWord}>PIXEL PLAZA</span>
+          <div className={styles.logoBlock} aria-label="Punsta logo">
+            <span className={styles.logoWord}>PUNSTA</span>
           </div>
           <Separator orientation="vertical" className="h-6 bg-black/50" />
           <div className="text-sm text-white/80 hidden sm:block">{roomTitle}</div>
           <div className="ml-auto flex items-center gap-2">
+            <Button
+              variant="outline"
+              className={styles.pixelButton}
+              onClick={() => setExperienceBrowserOpen((v) => !v)}
+            >
+              <Globe className="w-4 h-4" /> Experiences
+            </Button>
+            <Button variant="outline" className={styles.pixelButton} onClick={() => setPollHubOpen((v) => !v)}>
+              <Vote className="w-4 h-4" /> Polls
+            </Button>
+            <Button variant="outline" className={styles.pixelButton} onClick={() => setServerDashboardOpen((v) => !v)}>
+              <Server className="w-4 h-4" /> Servers
+            </Button>
             <Button variant="outline" className={styles.pixelButton} onClick={() => setNavOpen((v) => !v)}>
               <Map className="w-4 h-4" /> Navigator
             </Button>
@@ -539,6 +561,58 @@ export default function Page() {
           ariaTitle="Games hub window"
         >
           <GamesHub playerName={displayName} onSendMessage={handleSend} />
+        </WindowFrame>
+      )}
+
+      {experienceBrowserOpen && (
+        <WindowFrame
+          id="experience-browser"
+          title="🌍 Experience Browser"
+          variant="habbo"
+          initial={{ x: 50, y: 50, w: 500, h: 600 }}
+          onClose={() => setExperienceBrowserOpen(false)}
+          ariaTitle="Experience browser window"
+        >
+          <ExperienceBrowser
+            playerName={displayName}
+            onJoinExperience={(experienceId) => {
+              console.log(`Joining experience: ${experienceId}`)
+              // Handle joining experience
+            }}
+            onSendMessage={handleSend}
+          />
+        </WindowFrame>
+      )}
+
+      {pollHubOpen && (
+        <WindowFrame
+          id="poll-hub"
+          title="📊 Experience Polls"
+          variant="habbo"
+          initial={{ x: 100, y: 100, w: 450, h: 550 }}
+          onClose={() => setPollHubOpen(false)}
+          ariaTitle="Experience poll hub window"
+        >
+          <ExperiencePollHub playerName={displayName} onSendMessage={handleSend} />
+        </WindowFrame>
+      )}
+
+      {serverDashboardOpen && (
+        <WindowFrame
+          id="server-dashboard"
+          title="🖥️ Server Capacity Dashboard"
+          variant="habbo"
+          initial={{ x: 150, y: 50, w: 600, h: 650 }}
+          onClose={() => setServerDashboardOpen(false)}
+          ariaTitle="Server capacity dashboard window"
+        >
+          <ServerCapacityDashboard
+            playerName={displayName}
+            onJoinServer={(serverId) => {
+              console.log(`Joining server: ${serverId}`)
+              // Handle server joining
+            }}
+          />
         </WindowFrame>
       )}
     </div>
